@@ -1,13 +1,25 @@
+local runonactor = ((syn and syn.run_on_actor))
+local getactors = ((getactors))
 local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))();
 local Notify = AkaliNotif.Notify;
 
-if syn then
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
+if runonactor and getactors then
+    local actor = getactors()[1]
+    if not actor then
+        return Notify({
+            Title = "<font color='#ff0000'>Error</font>",
+            Description = "Unable to find the Phantom Forces Actor.<br /><br />Join our discord server for support: <font color='#7289da'>discord.gg/g4EGAwjUAK</font> (copied)",
+            Duration = 15,
+        })
+    end
+    runonactor(actor, [[
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
+    ]])
 else
 	Notify({
 		Title = "<font color='#0000ff'>Info</font>",
 		Description = "Loading non-synapse script for Phantom Forces.<br />This script version contains less features than the Synapse X version.<br />",
 		Duration = 10,
 	})
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/nonsynx'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
 end
