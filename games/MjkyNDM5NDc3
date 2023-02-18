@@ -3,6 +3,12 @@ local getactors = ((getactors))
 local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))();
 local Notify = AkaliNotif.Notify;
 
+Notify({
+    Title = "<font color='#0000ff'>Info</font>",
+	Description = "mopsHub loading...<br/>Do not leave!<br/>",
+	Duration = 4,
+})
+task.wait(4)
 if runonactor and getactors then
     local actor = getactors()[1]
     if not actor then
@@ -13,13 +19,8 @@ if runonactor and getactors then
         })
     end
     runonactor(actor, [[
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/test'))()
     ]])
 else
-	Notify({
-		Title = "<font color='#0000ff'>Info</font>",
-		Description = "Loading non-synapse script for Phantom Forces.<br />This script version contains less features than the Synapse X version.<br />",
-		Duration = 10,
-	})
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/test'))()
 end
