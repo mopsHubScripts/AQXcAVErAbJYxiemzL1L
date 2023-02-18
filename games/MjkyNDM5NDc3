@@ -5,11 +5,11 @@ local Notify = AkaliNotif.Notify;
 
 Notify({
     Title = "<font color='#0000ff'>Info</font>",
-	Description = "mopsHub loading...<br/>Do not leave!<br/>",
-	Duration = 4,
+	Description = "mopsHub loading... Do not leave!<br/>! IF YOU ARE NOT USING SYNAPSE, YOU HAVE TO EXECUTE THE SCRIPT AGAIN, AFTER YOU GOT TELEPORTED!<br/>",
+	Duration = 10,
 })
-task.wait(4)
-if runonactor and getactors then
+task.wait(10)
+if syn and runonactor and getactors then
     local actor = getactors()[1]
     if not actor then
         return Notify({
