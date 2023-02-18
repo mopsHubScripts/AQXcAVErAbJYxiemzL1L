@@ -19,8 +19,8 @@ if syn and runonactor and getactors then
         })
     end
     runonactor(actor, [[
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/test'))()
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
     ]])
 else
-	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/test'))()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/mopsHubScripts/AQXcAVErAbJYxiemzL1L/main/games/pf/synx'))()
 end
