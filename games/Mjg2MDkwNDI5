@@ -1,3 +1,7 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--mopsHub - Arsenal
+--script messy as fuck ik. ill remake it soon
+
 local s,e = pcall(function()
     if not(game.PlaceId == 286090429) then return end
     repeat
@@ -10,13 +14,11 @@ local s,e = pcall(function()
 
     --MODULES
 	local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
-	local AkaliNotif = loadstring(game:HttpGet("https://raw.githubusercontent.com/Kinlei/Dynissimo/main/Scripts/AkaliNotif.lua"))();
     local ESPFramework = loadstring(game:HttpGet("https://raw.githubusercontent.com/NougatBitz/Femware-Leak/main/ESP.lua", true))()
-	local Notify = AkaliNotif.Notify;
 	local writeclipboard,encodeb64,decodeb64,Request = ((syn and syn.write_clipboard) or setclipboard),((syn and syn.crypt.base64.encode) or (Krnl and Krnl.Base64.Encode)),((syn and syn.crypt.base64.decode) or (Krnl and Krnl.Base64.Decode)),(http_request or syn and syn.request or request or nil)
     local standard_firerate_values = {}
-    local Client = getsenv(game:GetService("Players").LocalPlayer.PlayerGui.GUI.Client)
 	local Player = game:GetService("Players").LocalPlayer
+    local Client = getsenv(Player.PlayerGui.GUI.Client)
 	local settings = {
 		autoLoadConfigs = nil,
 	}
@@ -34,31 +36,11 @@ local s,e = pcall(function()
             FaceCamOn = false,
             Distance = 2000,
         },
-        ScrapESP = {
-            Enabled = false,
-            Distance = 2000,
-            LegendaryOnly = true,
-            RareOnly = true,
-            GoodOnly = true,
-            BadOnly = true
-        },
-        SafeESP = {
-            Enabled = false,
-            Distance = 2000,
-            BigOnly = true,
-            SmallOnly = true
-        },
-        RegisterESP = {
-            Enabled = false,
-            Distance = 2000
-        },
         ESPColor = Color3.fromRGB(255, 255, 255),
         ToolColor = Color3.fromRGB(255, 255, 255)
     }
 
     local Players = game:GetService("Players")
-    local Player = Players.LocalPlayer
-    local Mouse = Player:GetMouse()
     local RunService = game:GetService("RunService")
 
     --STUFF THAT NEEDS TO RUN AT EXECUTE
@@ -117,74 +99,59 @@ local s,e = pcall(function()
 					Flag = "_slientaimbot",
 					Callback = function(Value)
 						getgenv()._slientaimbot = Value
-                        local L_32_ = workspace.CurrentCamera
-                        local L_33_ = game.GetService(game, "Players")
-                        local L_34_ = L_33_.LocalPlayer
-                        local L_35_ = L_34_:GetMouse()
-                        local L_36_ = getrawmetatable(game)
-                        local L_37_ = L_36_.__namecall
-                        local L_38_ = L_36_.__index
-                        function ClosestPlayer()
-                            local L_39_, L_40_ = math.huge
-                            for L_41_forvar1, L_42_forvar2 in pairs(L_33_.GetPlayers(L_33_)) do
-                                if L_42_forvar2 == L_34_ then
+                        local cam = workspace.CurrentCamera
+                        local mouse = Player:GetMouse()
+                        local gmt = getrawmetatable(game)
+                        local nc = gmt.__namecall
+                        local old = gmt.__index
+                        local function ClosestPlayer()
+                            local dis, target = math.huge, nil
+                            for _, v in pairs(Players.GetPlayers(Players)) do
+                                if v == Player then
+                                    continue
+                                end; if v.Team == Player then
+                                    continue
+                                end; if not v.Character then
                                     continue
                                 end
-                                if L_42_forvar2.Team == L_34_ then
+                                local head = v.Character.FindFirstChild(v.Character, "Head")
+                                if not head then
                                     continue
                                 end
-                                if not L_42_forvar2.Character then
+                                local screenpos, vis = cam.WorldToScreenPoint(cam, head.Position)
+                                if not vis then
                                     continue
                                 end
-                                local L_43_ = L_42_forvar2.Character.FindFirstChild(L_42_forvar2.Character, "Head")
-                                if not L_43_ then
-                                    continue
-                                end
-                                local L_44_, L_45_ = L_32_.WorldToScreenPoint(L_32_, L_43_.Position)
-                                if not L_45_ then
-                                    continue
-                                end
-                                local L_46_, L_47_ = Vector2.new(L_35_.X, L_35_.Y), Vector2.new(L_44_.X, L_44_.Y)
-                                local L_48_ = (L_47_ - L_46_).Magnitude
-                                if L_48_ < L_39_ and L_48_ < getgenv()._fov then
-                                    L_39_ = L_48_
-                                    L_40_ = L_42_forvar2
+                                local p1, p2 = Vector2.new(mouse.X, mouse.Y), Vector2.new(screenpos.X, screenpos.Y)
+                                local mag = (p2 - p1).Magnitude
+                                if mag < dis and mag < getgenv()._fov then
+                                    dis = mag
+                                    target = v
                                 end
                             end
-                            return L_40_
+                            return target
                         end
-                        setreadonly(L_36_, false)
-                        L_36_.__namecall = newcclosure(function(L_49_arg1, ...)
-                            local L_50_, L_51_ = {
+                        setreadonly(gmt, false)
+                        gmt.__namecall = newcclosure(function(self, ...)
+                            local args, method = {
                                 ...
                             }, getnamecallmethod()
-                            if getgenv()._slientaimbot and L_51_ == "FindPartOnRayWithIgnoreList" and not checkcaller() then
-                                local L_52_ = ClosestPlayer()
-                                if L_52_ and L_52_.Character and L_52_.Character.FindFirstChild(L_52_.Character, getgenv().getHitPart()) then
-                                    L_50_[1] = Ray.new(L_32_.CFrame.Position, (L_52_.Character[getgenv().getHitPart()].Position - L_32_.CFrame.Position).Unit * 1000)
-                                    return L_37_(L_49_arg1, unpack(L_50_))
+                            if getgenv()._slientaimbot and method == "FindPartOnRayWithIgnoreList" and not checkcaller() then
+                                local target = ClosestPlayer()
+                                if target and target.Character and target.Character.FindFirstChild(target.Character, getgenv().getHitPart()) then
+                                    args[1] = Ray.new(cam.CFrame.Position, (target.Character[getgenv().getHitPart()].Position - cam.CFrame.Position).Unit * 1000)
+                                    return nc(self, unpack(args))
                                 end
                             end
-                            return L_37_(L_49_arg1, ...)
+                            return nc(self, ...)
                         end)
-                        L_36_.__index = newcclosure(function(L_53_arg1, L_54_arg2)
-                            if L_54_arg2 == "Clips" then
+                        gmt.__index = newcclosure(function(self, i)
+                            if i == "Clips" then
                                 return workspace.Map
                             end
-                            return L_38_(L_53_arg1, L_54_arg2)
+                            return old(self, i)
                         end)
-                        setreadonly(L_36_, true)
-					end,
-				}
-			},
-            {
-				Function = "CreateToggle",
-				_envState =  false,
-				Args = {
-					Name = "Wallbang",
-					Flag = "_wallbang",
-					Callback = function(Value)
-						getgenv()._wallbang = Value
+                        setreadonly(gmt, true)
 					end,
 				}
 			},
@@ -227,7 +194,7 @@ local s,e = pcall(function()
 					end,
 				}
 			},
-            {
+            --[[{
 				Function = "CreateSection",
 				Args = "━ Kill Aura ━",
 			},
@@ -241,7 +208,7 @@ local s,e = pcall(function()
 						getgenv()._killaura = Value
 					end,
 				}
-			},
+			},]]
             {
 				Function = "CreateSection",
 				Args = "━ Gun Mods ━",
@@ -444,7 +411,7 @@ local s,e = pcall(function()
                     Name = "Godmode",
                     Callback = function()
                         pcall(function()
-                            game.Players.LocalPlayer.Character.LowerTorso.Root:Destroy()
+                            Player.Character.LowerTorso.Root:Destroy()
                         end)
                     end
                 }
@@ -584,9 +551,6 @@ local s,e = pcall(function()
     }
 
     local _CREDITS = {
-		["Special Thanks"] = {
-			{"Unknown sources",""},
-		},
 		["Developers"] = {
 			{"ShyFlooo","Programmer"},
 		},
@@ -609,54 +573,7 @@ local s,e = pcall(function()
         ESPFramework:Toggle(getgenv()._esp)
     end; getgenv().updateespvalues()
 
-    local function KillPlayer(Player)
-        if not Player.Character or not Player.Character:FindFirstChild("HumanoidRootPart") then
-            return
-        end;
-        local BitBuffer = require(game:GetService("ReplicatedStorage").Modules.BitBuffer)()
-        BitBuffer.writeString(game:GetService("Players").LocalPlayer.NRPBS.EquippedTool.Value)
-        BitBuffer.writeUnsigned(2, 1)
-        BitBuffer.writeUnsigned(2, 0)
-        BitBuffer.writeInt8(1)
-        BitBuffer.writeFloat16(50)
-        BitBuffer.writeInt8(1)
-        BitBuffer.writeUnsigned(1, 0)
-        BitBuffer.writeUnsigned(1, 0)
-        BitBuffer.writeVector3(Player.Character.HumanoidRootPart.Position)
-        BitBuffer.writeVector3(Player.Character.HumanoidRootPart.Position)
-        return game.ReplicatedStorage.Events["" .. "\226\128\139HitPart"]:FireServer(Player.Character.HumanoidRootPart, BitBuffer.dumpString(), "swaggg")
-    end; local function TeamCheck(arg1, player)
-        local character = game.Players.GetPlayerFromCharacter(game.Players, player)
-        if player.FindFirstChild(player, "Bot") then
-            return false
-        end;
-        if game.ReplicatedStorage.wkspc.BF.Value == true and character ~= arg1 then
-            return true
-        end;
-        if (not character or character ~= arg1) and not arg1.FindFirstChild(arg1, "IsJugg") and (not character or not character.FindFirstChild(character, "IsJugg") or arg1.FindFirstChild(arg1, "IsJugg") ~= nil) and ((game.ReplicatedStorage.wkspc.BR.Value ~= true or not character or character.DesignColor.Value == arg1.DesignColor.Value) and arg1.FriendlyFire.Value ~= true and character ~= nil) and (not character or character.Status.Team.Value == arg1.Status.Team.Value) then
-            return true
-        end;
-        return false
-    end; local function ClosestPlayer()
-        local maxDis, t = math.huge;
-        for _, v in pairs(game:GetService("Players").GetPlayers(game:GetService("Players"))) do
-            if v.Character and v ~= game.Players.LocalPlayer and not TeamCheck(game.Players.LocalPlayer, v.Character) then
-                local target = v.Character.FindFirstChild(v.Character, "Head")
-                if target then
-                    local screenpos, vis = workspace.CurrentCamera.WorldToScreenPoint(workspace.CurrentCamera, target.Position)
-                    if vis then
-                        local c1, c2 = Vector2.new(Player:GetMouse().X, Player:GetMouse().Y), Vector2.new(screenpos.X, screenpos.Y)
-                        local Magnitude = (c2 - c1).Magnitude;
-                        if Magnitude < maxDis and Magnitude <= getgenv()._fov then
-                            maxDis = Magnitude;
-                            t = v
-                        end
-                    end
-                end
-            end
-        end;
-        return t
-    end; getgenv().getHitPart = function()
+    getgenv().getHitPart = function()
         if getgenv()._silentaimhitpart == "Head" then
             return "Head"
         end;
@@ -745,7 +662,6 @@ local s,e = pcall(function()
 						else
 							print("Unable to create "..tostring(func.Function).. " function for ".. index .. " ["..i.."]")
 						end
-		
 						if func.Args.Flag then
 							--print("Creating env ".. tostring(func.Args.Flag) .. " with the value ".. tostring(func._envState))
 							getgenv()[func.Args.Flag] = func._envState
@@ -761,14 +677,41 @@ local s,e = pcall(function()
 
 	--> MAIN
 
+    local function GetEnemys()
+        local IsHackula = function()
+            if game.Workspace:FindFirstChild("Map") then
+                if game.Workspace.Map:FindFirstChild("Hackula") then
+                    if game.Workspace.Map.Hackula:FindFirstChild("Head") then
+                        return true
+                    end
+                end
+            end
+            return false
+        end
+
+        local plrs = {}
+        if not IsHackula() then
+            if not game.ReplicatedStorage.wkspc.Status.RoundOver.Value and not game.ReplicatedStorage.wkspc.Status.Preparation.Value and Player.Status.Team.Value ~= "Spectator" then
+                for _,v in pairs(game.Players:GetChildren()) do
+                    if (v.Team~=Player.Team or game.ReplicatedStorage.wkspc.FFA.Value) and v ~= Player then
+                        if v.Character and not v.Character:FindFirstChild("ShuckyHAX") and v.Character:FindFirstChild("Spawned") then
+                            table.insert(plrs,v)
+                        end
+                    end
+                end
+            end
+        else
+            table.insert(plrs, {Character=game.Workspace.Map.Hackula})
+        end
+        return plrs
+    end
+
     --Anti Aim | Source: self made
 
     local old;
-    old = hookmetamethod(game, "__namecall", function(a, ...)
-        Args = {
-            ...
-        }
-        if getnamecallmethod() == "FireServer" and tostring(a) == "ControlTurn" then
+    old = hookmetamethod(game, "__namecall", function(self, ...)
+        local Args = { ... }
+        if getnamecallmethod() == "FireServer" and tostring(self) == "ControlTurn" then
             if getgenv()._antiaim then
                 if getgenv()._antiaimmethod == "Look Up" then
                     Args[1 + 0] = 1.3962564026167
@@ -782,10 +725,10 @@ local s,e = pcall(function()
                 if getgenv()._antiaimmethod == "__test__aam" then
                     Args[1] = getgenv().__test__aam_t
                 end;
-                return old(a, unpack(Args))
+                return old(self, unpack(Args))
             end
         end;
-        return old(a, ...)
+        return old(self, ...)
     end)
 
     --FOV
@@ -821,7 +764,7 @@ local s,e = pcall(function()
 	game:GetService('UserInputService').InputBegan:Connect(function(UserInput)
 		if UserInput.UserInputType == Enum.UserInputType.Keyboard and UserInput.KeyCode == Enum.KeyCode.Space then
 			if not getgenv()._infjump then return end
-			Action(game:GetService('Players').LocalPlayer.Character.Humanoid, function(self)
+			Action(Player.Character.Humanoid, function(self)
 				if self:GetState() == Enum.HumanoidStateType.Jumping or self:GetState() == Enum.HumanoidStateType.Freefall then
 					Action(self.Parent.HumanoidRootPart, function(self)
 						self.Velocity = Vector3.new(0, getgenv()._infjumpheight or 50, 0);
@@ -830,42 +773,6 @@ local s,e = pcall(function()
 			end)
 		end
 	end)
-
-    --Wallbang | Source: self made
-
-    task.spawn(function()
-        local mt = getrawmetatable(game)
-        local namecallold = mt.__namecall
-        local index = mt.__index
-        setreadonly(mt, false)
-        mt.__namecall = newcclosure(function(self, ...)
-            local Args = {...}
-            NamecallMethod = getnamecallmethod()
-            if tostring(NamecallMethod) == "FindPartOnRayWithIgnoreList" and getgenv()._wallbang then
-                table.insert(Args[2], workspace.Map)
-            end
-            return namecallold(self, ...)
-        end)
-        setreadonly(mt, true)
-
-        local ping = 32
-        task.spawn(function()
-            while task.wait(0.1) do
-                ping = math.random(30, 70)
-            end
-        end)
-        task.spawn(function()
-            game:GetService("RunService").RenderStepped:connect(function()game.Players.LocalPlayer.Ping.Value = ping
-            end)
-        end)
-        while task.wait() do
-            local args = {
-                [1] = 100,
-                [2] = "PingDeez"
-            }
-            game:GetService("ReplicatedStorage").Events.UpdatePing:FireServer(unpack(args))
-        end
-    end)
 
     --Gun Mods | Source: self made
 
@@ -883,13 +790,23 @@ local s,e = pcall(function()
             FOVCircle.Visible = getgenv()._showfov;
         end
         if getgenv()._rainbowgun then
-            for _, v in pairs(game.Workspace.Camera.Arms:GetChildren()) do
-				if v:IsA("BasePart") then
-					v.Color = Color3.fromHSV(tick() % 5 / 5, 1 + 0, 1)
-					v.Transparency = 0.5
-					v.Material = "ForceField"
-				end
-			end
+            pcall(function()
+                for _, v in pairs(game.Workspace.Camera.Arms:GetChildren()) do
+                    if v:IsA("BasePart") then
+                        v.Color = Color3.fromHSV(tick() % 5 / 5, 1 + 0, 1)
+                        v.Transparency = 0.5
+                        v.Material = "ForceField"
+                    end
+                end
+            end)
+        end
+
+        if getgenv()._killaura then
+            for _,v in pairs(GetEnemys())do
+                if (Player.Character.HumanoidRootPart.Position-v.Character.HumanoidRootPart.Position).Magnitude < 50 then
+                    ReplicatedStorage.Events.Burn:FireServer(v.Character.Head,ReplicatedStorage.Weapons["Acid Spitter"],1,v.Character.Head.Position+Vector3.new(math.random(),math.random(),math.random()))
+                end
+            end
         end
     end)
 
@@ -928,65 +845,11 @@ local s,e = pcall(function()
             if getgenv()._automatic then
                 getsenv(Player.PlayerGui.GUI.Client.Functions.Weapons).mode = "automatic"
             end
-            --[[if getgenv()._chatspammer then
-                game:GetService("ReplicatedStorage").Events.PlayerChatted:FireServer("Hah!", getgenv()._chatspammsg, false, nil, true, true)
-            end]]
+            if getgenv()._chatspammer then
+                game:GetService("ReplicatedStorage").Events.PlayerChatted:FireServer("Hah!", getgenv()._chatspammsg, false, false, true)
+            end
             if getgenv()._autorespawn then
                 Client.reviveme = true
-            end
-        end
-    end)
-
-    --Kill Aura | Source Code: kinda self made
-
-    task.spawn(function()
-        while task.wait() do
-            if getgenv()._killaura and Player.PlayerGui.GUI.Timer.Sub.Visible == false then
-                pcall(function()
-                    for _, v in pairs(game.Players:GetPlayers()) do
-                        if v and v ~= Player and v.Character and v.Character:FindFirstChild("Head") then
-                            local Magnitude = (Player.Character.PrimaryPart.Position - v.Character.PrimaryPart.Position).Magnitude;
-                            local CurrentWeapon = game.ReplicatedStorage.Weapons:FindFirstChild(Player.NRPBS.EquippedTool.Value)
-                            if CurrentWeapon:FindFirstChild("Projectile") and workspace:FindFirstChild("Map") then
-                                game:GetService("ReplicatedStorage").Events.CreateProjectile:FireServer("Rocket", 5 + 6295, Vector3.new(), CFrame.new(), 50, 50, 1, 35, CurrentWeapon.Name, Vector3.new(), false, nil, {
-                                    [1] = game:GetService("Workspace").Map.Clips,
-                                    [2] = game:GetService("Workspace").Debris,
-                                    [3] = Player.Character,
-                                    [4 + 0] = game:GetService("Workspace")["Ray_Ignore"],
-                                    [5] = game:GetService("Workspace").Map.Spawns
-                                }, nil, {
-                                    [1 + 0] = v.Character
-                                }, v.Character.Head, v.Character.Head.Position)
-                                game:GetService("ReplicatedStorage").Events.ReplicateProjectile:FireServer({
-                                    [1] = "Baseball",
-                                    [2] = 5 + 275,
-                                    [3] = v.Character.Head.Position,
-                                    [4] = v.Character.Head.CFrame,
-                                    [5] = 45,
-                                    [6] = 0,
-                                    [7] = 0,
-                                    [8] = 0 + 0,
-                                    [5 + 4] = "Snowball",
-                                    [10] = Vector3.new(-20.611129760742, 20.049995422363, 18.381494522095),
-                                    [11] = false,
-                                    [5 + 8] = {
-                                        [1] = game:GetService("Workspace").Map.Clips,
-                                        [2] = game:GetService("Workspace").Debris,
-                                        [3] = Player.Character,
-                                        [4] = game:GetService("Workspace")["Ray_Ignore"],
-                                        [5] = game:GetService("Workspace").Map.Spawns,
-                                        [6] = game:GetService("Workspace").Map.Ignore
-                                    },
-                                    [14] = 1 + 0
-                                })
-                            elseif not CurrentWeapon:FindFirstChild("Projectile") then
-                                if Magnitude <= 12 then
-                                    KillPlayer(v)
-                                end
-                            end
-                        end
-                    end
-                end)
             end
         end
     end)
