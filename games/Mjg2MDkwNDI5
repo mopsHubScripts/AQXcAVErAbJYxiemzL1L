@@ -157,12 +157,12 @@ local s,e = pcall(function()
 			},
             {
 				Function = "CreateDropdown",
-				_envState = "LowerTorso",
+				_envState = "Head",
 				Args = {
 					Name = "Hit Part",
 					Flag = "_silentaimhitpart",
 					Options = {"Head","LowerTorso","Random"},
-					CurrentOption = "LowerTorso",
+					CurrentOption = "Head",
 					Callback = function(Value)
 						getgenv()._silentaimhitpart = Value
 					end,
