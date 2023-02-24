@@ -6,9 +6,8 @@ local Notify = AkaliNotif.Notify;
 Notify({
     Title = "<font color='#0000ff'>Info</font>",
 	Description = "mopsHub loading... Do not leave!",
-	Duration = 5,
+	Duration = 3,
 })
-task.wait(5)
 if syn and runonactor and getactors then
     local actor = getactors()[1]
     if not actor then
